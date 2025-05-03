@@ -28,6 +28,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# settings.py (make sure MEDIA is configured)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
@@ -60,6 +64,21 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        # Optional: Add token-based authentication if needed later
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
+LOGIN_URL = '/login/google-oauth2/'
+LOGIN_REDIRECT_URL = '/'  # change to frontend or dashboard
+LOGOUT_REDIRECT_URL = '/'  # optional
+
 
 
 MIDDLEWARE = [
@@ -97,7 +116,6 @@ TEMPLATES[0]['OPTIONS']['context_processors'] += [
     'social_django.context_processors.backends',
     'social_django.context_processors.login_redirect',
 ]
-
 
 WSGI_APPLICATION = 'mysite.wsgi.application'
 
