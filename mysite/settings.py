@@ -28,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+
 # settings.py (make sure MEDIA is configured)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -42,6 +48,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email', 'profile']
 # Custom user model if you're using one (optional)
 AUTH_USER_MODEL = 'tickets.CustomUser'  # or just 'auth.User' if default
 
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
 
 # Application definition
 
@@ -49,7 +57,9 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'social_django',
+    'django_filters',
     'tickets', 
+    'django_celery_beat',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -72,7 +82,13 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ]
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,  # Adjust the number of items per page
 }
 
 LOGIN_URL = '/login/google-oauth2/'
