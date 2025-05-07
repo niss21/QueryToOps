@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from .models import Comment
 from .models import Ticket
 from django.contrib.auth import get_user_model
 
@@ -17,3 +18,11 @@ class TicketSerializer(serializers.ModelSerializer):
         ticket = Ticket.objects.create(created_by=self.context['request'].user, **validated_data)
         ticket.assigned_to.set(assigned_users)
         return ticket
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.email')
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'ticket', 'author', 'text', 'created_at']
+        read_only_fields = ['id', 'created_at', 'author']

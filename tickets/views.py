@@ -7,7 +7,7 @@ from .models import Ticket
 from .serializers import TicketSerializer
 from .permissions import IsCreatorOrAssignee
 from rest_framework.permissions import IsAuthenticated  
-
+from .serializers import CommentSerializer
 
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
@@ -53,3 +53,21 @@ class TicketViewSet(viewsets.ModelViewSet):
     ]
     ordering_fields = ['created_at', 'status', 'title']  # 👈 Allowed fields to order by
     ordering = ['-created_at']  # 👈 Default ordering
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Comment.objects.filter(ticket__id=self.kwargs['ticket_pk'])
+
+    def perform_create(self, serializer):
+        ticket_id = self.kwargs['ticket_pk']
+        ticket = Ticket.objects.get(pk=ticket_id)
+        user = self.request.user
+
+        # Only creator or assigned users can comment
+        if ticket.created_by != user and user not in ticket.assigned_to.all():
+            raise PermissionDenied("You are not allowed to comment on this ticket.")
+
+        serializer.save(author=user, ticket=ticket)

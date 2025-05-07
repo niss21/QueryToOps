@@ -57,3 +57,12 @@ class Ticket(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.status}"
+    
+class Comment(models.Model):
+    ticket = models.ForeignKey('Ticket', related_name='comments', on_delete=models.CASCADE)
+    author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.author.email} on {self.ticket.title}"
