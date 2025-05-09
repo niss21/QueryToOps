@@ -15,7 +15,8 @@ class TicketSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         assigned_users = validated_data.pop('assigned_to')
-        ticket = Ticket.objects.create(created_by=self.context['request'].user, **validated_data)
+        # ticket = Ticket.objects.create(created_by=self.context['request'].user, **validated_data)
+        ticket = Ticket.objects.create(**validated_data)
         ticket.assigned_to.set(assigned_users)
         return ticket
 
