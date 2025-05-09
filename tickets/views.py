@@ -8,6 +8,10 @@ from .serializers import TicketSerializer
 from .permissions import IsCreatorOrAssignee
 from rest_framework.permissions import IsAuthenticated  
 from .serializers import CommentSerializer
+from .models import Comment
+from rest_framework.exceptions import PermissionDenied
+from django.db import models
+
 
 class TicketViewSet(viewsets.ModelViewSet):
     queryset = Ticket.objects.all()
@@ -31,9 +35,17 @@ class TicketViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)  # automatically sets creator
 
+    # def get_queryset(self):
+    #     # Only tickets created by this user
+    #     return Ticket.objects.filter(created_by=self.request.user)
+
     def get_queryset(self):
-        # Only tickets created by this user
-        return Ticket.objects.filter(created_by=self.request.user)
+        user = self.request.user
+        return Ticket.objects.filter(
+            models.Q(created_by=user) | models.Q(assigned_to=user)
+        ).distinct()
+
+
     
     @action(detail=False, methods=['get'], permission_classes=[IsAuthenticated])
     def assigned(self, request):
