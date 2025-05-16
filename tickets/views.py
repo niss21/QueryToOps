@@ -23,6 +23,7 @@ class TicketViewSet(viewsets.ModelViewSet):
     'created_at': ['gte', 'lte'],  # ⬅️ allow filtering by date range
     'status': ['exact'],
     'assigned_to': ['exact'],
+    'category': ['exact'],
 }  # Filter by these fields
     search_fields = ['title', 'description']      # Enable search by text
 

@@ -38,7 +38,11 @@ class Ticket(models.Model):
         ('completed', 'Completed'),
         ('extended', 'Extended'),
     ]
-
+    CATEGORY_CHOICES = [
+    ('rides', 'Rides'),
+    ('food', 'Food'),
+    ('route', 'Route'),
+]
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=255)
     image = models.ImageField(upload_to='ticket_images/', blank=True, null=True)
@@ -53,6 +57,7 @@ class Ticket(models.Model):
         related_name='assigned_tickets'
     )
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='active')
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
